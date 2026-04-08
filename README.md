@@ -22,3 +22,5 @@ Proyek ini adalah aplikasi blog berbasis cloud menggunakan AWS yang dapat diakse
 - (Nama 2) - DevOps Engineer
 - (Nama 3) - Backend Developer
 - (Nama 4) - Security Engineer
+
+tes
