@@ -23,4 +23,4 @@ Proyek ini adalah aplikasi blog berbasis cloud menggunakan AWS yang dapat diakse
 - (Bagus Rian Bahari) - Backend Developer
 - (Izzudin Ariq Al Hafiz) - Security Engineer
 
-tes
+
