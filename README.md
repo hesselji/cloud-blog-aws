@@ -18,9 +18,9 @@ Proyek ini adalah aplikasi blog berbasis cloud menggunakan AWS yang dapat diakse
 - CloudWatch
 
 ## Tim
-- (Nama 1) - Cloud Architect
-- (Nama 2) - DevOps Engineer
-- (Nama 3) - Backend Developer
-- (Nama 4) - Security Engineer
+- (Mahendra Juliansen) - Cloud Architect
+- (Hessel Josef Immanuel) - DevOps Engineer
+- (Bagus Rian Bahari) - Backend Developer
+- (Izzudin Ariq Al Hafiz) - Security Engineer
 
 tes
