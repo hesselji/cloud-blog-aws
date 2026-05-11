@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *.log
 .DS_Store
 .env
@@ -24,3 +25,10 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+=======
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+>>>>>>> 15daab5b27ff812776bc7331a06b59a26985b35a
+:wq
