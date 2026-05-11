@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
@@ -56,3 +57,31 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+=======
+# Cloud Blog Platform (AWS)
+
+## Deskripsi
+Proyek ini adalah aplikasi blog berbasis cloud menggunakan AWS yang dapat diakses secara online.
+
+## Fitur
+- Login user
+- CRUD artikel
+- Upload gambar
+
+## Layanan AWS
+- EC2
+- RDS
+- S3
+- CloudFront
+- VPC
+- IAM
+- CloudWatch
+
+## Tim
+- (Mahendra Juliansen) - Cloud Architect
+- (Hessel Josef Immanuel) - DevOps Engineer
+- (Bagus Rian Bahari) - Backend Developer
+- (Izzudin Ariq Al Hafiz) - Security Engineer
+
+
+>>>>>>> 15daab5b27ff812776bc7331a06b59a26985b35a
