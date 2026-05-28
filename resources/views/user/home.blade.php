@@ -11,8 +11,8 @@
 
         <div class="hero-card">
 
-            @if($headline->image)
-                <img src="{{ asset('images/' . $headline->image) }}">
+            @if($headline->image_url)
+                <img src="{{ $headline->image_url }}" alt="{{ $headline->title }}">
             @endif
 
             <div class="hero-content">
@@ -55,8 +55,8 @@
 
             <div class="sidebar-card mb-3">
 
-                @if($post->image)
-                    <img src="{{ asset('images/' . $post->image) }}">
+                @if($post->image_url)
+                    <img src="{{ $post->image_url }}" alt="{{ $post->title }}">
                 @endif
 
                 <div class="p-3">
@@ -112,8 +112,8 @@
 
                 <div class="news-card h-100">
 
-                    @if($post->image)
-                        <img src="{{ asset('images/' . $post->image) }}">
+                    @if($post->image_url)
+                       <img src="{{ $post->image_url }}" alt="{{ $post->title }}">
                     @endif
 
                     <div class="p-3">

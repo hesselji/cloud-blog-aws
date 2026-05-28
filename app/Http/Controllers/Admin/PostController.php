@@ -3,177 +3,152 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Post;
 use App\Models\Category;
+use App\Models\Post;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class PostController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | TAMPILKAN SEMUA BERITA
-    |--------------------------------------------------------------------------
-    */
-
-    public function index()
+    public function index(): View
     {
         $posts = Post::with('category')
-                    ->latest()
-                    ->get();
+            ->latest()
+            ->get();
 
         return view('admin.posts.index', compact('posts'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | FORM TAMBAH BERITA
-    |--------------------------------------------------------------------------
-    */
-
-    public function create()
+    public function create(): View
     {
         $categories = Category::all();
 
         return view('admin.posts.create', compact('categories'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | SIMPAN BERITA
-    |--------------------------------------------------------------------------
-    */
-
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        // VALIDASI
-        $request->validate([
-            'title' => 'required',
-            'content' => 'required',
-            'categories_id' => 'required',
-            'status' => 'required',
-            'image' => 'required|image|mimes:jpg,jpeg,png|max:2048'
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'slug' => ['nullable', 'string', 'max:255'],
+            'content' => ['required', 'string'],
+            'categories_id' => ['required', 'integer', 'exists:categories,id_categories'],
+            'status' => ['required', 'in:draft,published'],
+            'image' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ]);
 
-        // UPLOAD GAMBAR
         $file = $request->file('image');
 
-        $filename = time() . '.' .
-                    $file->getClientOriginalExtension();
+        if (!$file instanceof UploadedFile) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'image' => 'File gambar tidak valid.',
+                ]);
+        }
 
-        $file->move(public_path('images'), $filename);
+        $imagePath = $this->uploadImageToS3($file);
 
-        // SIMPAN DATA
         Post::create([
-            'title' => $request->title,
-            'slug' => $request->slug
-                        ? Str::slug($request->slug)
-                        : Str::slug($request->title),
-            'content' => $request->content,
-            'categories_id' => $request->categories_id,
-            'status' => $request->status,
-            'image' => $filename
+            'title' => $validated['title'],
+            'slug' => !empty($validated['slug'])
+                ? Str::slug($validated['slug'])
+                : Str::slug($validated['title']),
+            'content' => $validated['content'],
+            'categories_id' => $validated['categories_id'],
+            'status' => $validated['status'],
+            'image' => $imagePath,
         ]);
 
         return redirect('/admin/posts')
-                ->with('success', 'Berita berhasil ditambahkan');
+            ->with('success', 'Berita berhasil ditambahkan');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | FORM EDIT
-    |--------------------------------------------------------------------------
-    */
-
-    public function edit($id)
+    public function edit(int $id): View
     {
         $post = Post::findOrFail($id);
 
         $categories = Category::all();
 
-        return view(
-            'admin.posts.edit',
-            compact('post', 'categories')
-        );
+        return view('admin.posts.edit', compact('post', 'categories'));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | UPDATE DATA
-    |--------------------------------------------------------------------------
-    */
-
-        public function update(Request $request, $id)
+    public function update(Request $request, int $id): RedirectResponse
     {
         $post = Post::findOrFail($id);
 
-        // VALIDASI
-        $request->validate([
-            'title' => 'required',
-            'content' => 'required',
-            'status' => 'required',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'slug' => ['nullable', 'string', 'max:255'],
+            'content' => ['required', 'string'],
+            'categories_id' => ['nullable', 'integer', 'exists:categories,id_categories'],
+            'status' => ['required', 'in:draft,published'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ]);
 
-        // UPDATE DATA
-        $post->title = $request->title;
-        $post->content = $request->content;
-        $post->status = $request->status;
+        $post->title = $validated['title'];
+        $post->slug = !empty($validated['slug'])
+            ? Str::slug($validated['slug'])
+            : Str::slug($validated['title']);
+        $post->content = $validated['content'];
+        $post->status = $validated['status'];
 
-        // JIKA ADA GAMBAR BARU
-        if ($request->hasFile('image')) {
+        if (!empty($validated['categories_id'])) {
+            $post->categories_id = $validated['categories_id'];
+        }
 
-            // HAPUS GAMBAR LAMA
-            if (
-                $post->image &&
-                file_exists(public_path('images/' . $post->image))
-            ) {
-                unlink(public_path('images/' . $post->image));
-            }
+        $file = $request->file('image');
 
-            // UPLOAD GAMBAR BARU
-            $file = $request->file('image');
+        if ($file instanceof UploadedFile) {
+            $this->deleteOldImage($post->image);
 
-            $filename = time() . '.' .
-                        $file->getClientOriginalExtension();
-
-            $file->move(public_path('images'), $filename);
-
-            // SIMPAN GAMBAR BARU
-            $post->image = $filename;
+            $post->image = $this->uploadImageToS3($file);
         }
 
         $post->save();
 
         return redirect('/admin/posts')
-                ->with('success', 'Berita berhasil diupdate');
+            ->with('success', 'Berita berhasil diupdate');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | HAPUS DATA
-    |--------------------------------------------------------------------------
-    */
-
-    public function destroy($id)
+    public function destroy(int $id): RedirectResponse
     {
-    $post = Post::where('id_posts', $id)
-        ->firstOrFail();
+        $post = Post::findOrFail($id);
 
-    // HAPUS GAMBAR
-    if (
-        $post->image &&
-        file_exists(public_path('images/' . $post->image))
-    ) {
-        unlink(
-            public_path('images/' . $post->image)
-        );
+        $this->deleteOldImage($post->image);
+
+        $post->delete();
+
+        return redirect('/admin/posts')
+            ->with('success', 'Berita berhasil dihapus');
     }
 
-    // HAPUS DATA POST
-    $post->delete();
+    private function uploadImageToS3(UploadedFile $file): string
+    {
+        $filename = time() . '_' . Str::random(12) . '.' . $file->getClientOriginalExtension();
 
-    return redirect('/admin/posts')
-        ->with('success', 'Berita berhasil dihapus');
+        return $file->storeAs('images', $filename, 's3');
+    }
+
+    private function deleteOldImage(?string $image): void
+    {
+        if (!$image) {
+            return;
+        }
+
+        if (Str::startsWith($image, 'images/')) {
+            Storage::disk('s3')->delete($image);
+            return;
+        }
+
+        $localImagePath = public_path('images/' . $image);
+
+        if (file_exists($localImagePath)) {
+            unlink($localImagePath);
+        }
     }
 }

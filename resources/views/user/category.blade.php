@@ -30,7 +30,7 @@
                     @if($post->image)
 
                         <img
-                            src="{{ asset('images/' . $post->image) }}"
+                            src="{{ $post->image_url }}" alt="{{ $post->title }}"
                             class="card-img-top rounded-top-4"
                             style="height:230px; object-fit:cover;"
                         >

@@ -40,7 +40,7 @@ use Illuminate\Support\Str;
                 @if($article->image)
 
                     <img
-                        src="{{ asset('images/' . $article->image) }}"
+                       src="{{ $article->image_url }}" alt="{{ $article->title }}"
                         class="img-fluid rounded-4 shadow-sm w-100"
                         style="height:500px; object-fit:cover;"
                     >
@@ -161,7 +161,7 @@ use Illuminate\Support\Str;
                                 @if($item->image)
 
                                     <img
-                                        src="{{ asset('images/' . $item->image) }}"
+                                        src="{{ $item->image_url }}" alt="{{ $item->title }}"
                                         width="120"
                                         height="80"
                                         class="rounded-3"

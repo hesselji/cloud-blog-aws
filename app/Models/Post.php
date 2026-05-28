@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Models\Category;
-
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Filesystem\FilesystemAdapter;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Post extends Model
 {
@@ -18,16 +21,14 @@ class Post extends Model
         'content',
         'image',
         'status',
-        'categories_id'
+        'categories_id',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | RELATION CATEGORY
-    |--------------------------------------------------------------------------
-    */
+    protected $appends = [
+        'image_url',
+    ];
 
-    public function category()
+    public function category(): BelongsTo
     {
         return $this->belongsTo(
             Category::class,
@@ -36,5 +37,26 @@ class Post extends Model
         );
     }
 
-    
+    public function getImageUrlAttribute(): ?string
+    {
+        if (!$this->image) {
+            return null;
+        }
+
+        if (Str::startsWith($this->image, ['http://', 'https://'])) {
+            return $this->image;
+        }
+
+        if (Str::startsWith($this->image, 'images/')) {
+            /** @var FilesystemAdapter $disk */
+            $disk = Storage::disk('s3');
+
+            return $disk->temporaryUrl(
+                $this->image,
+                now()->addMinutes(60)
+            );
+        }
+
+        return asset('images/' . $this->image);
+    }
 }
