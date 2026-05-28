@@ -1,9 +1,13 @@
-<<<<<<< HEAD
 *.log
 .DS_Store
+Thumbs.db
+
 .env
+.env.*
+!.env.example
 .env.backup
 .env.production
+
 .phpactor.json
 .phpunit.result.cache
 /.codex
@@ -13,22 +17,27 @@
 /.phpunit.cache
 /.vscode
 /.zed
+
 /auth.json
 /node_modules
+/vendor
+
 /public/build
 /public/hot
 /public/storage
+
 /storage/*.key
 /storage/pail
-/vendor
+/storage/logs/*
+
+/database/*.sqlite
+/database/*.sqlite-*
+
 _ide_helper.php
 Homestead.json
 Homestead.yaml
-Thumbs.db
-=======
+
 .terraform/
 *.tfstate
 *.tfstate.*
 *.tfvars
->>>>>>> 15daab5b27ff812776bc7331a06b59a26985b35a
-:wq
