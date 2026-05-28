@@ -19,9 +19,11 @@
             <div class="card border-0 shadow-sm rounded-4 mb-4">
 
                 <div class="card-header bg-white py-3">
+
                     <h5 class="fw-bold mb-0">
                         Edit Berita
                     </h5>
+
                 </div>
 
                 <div class="card-body">
@@ -36,8 +38,22 @@
                         <input type="text"
                                name="title"
                                class="form-control form-control-lg"
-                               value="{{ $post->title }}"
+                               value="{{ old('title', $post->title) }}"
                                required>
+
+                    </div>
+
+                    {{-- SLUG --}}
+                    <div class="mb-4">
+
+                        <label class="form-label fw-semibold">
+                            Slug URL
+                        </label>
+
+                        <input type="text"
+                               name="slug"
+                               class="form-control"
+                               value="{{ old('slug', $post->slug) }}">
 
                     </div>
 
@@ -51,7 +67,7 @@
                         <textarea name="content"
                                   rows="12"
                                   class="form-control"
-                                  required>{{ $post->content }}</textarea>
+                                  required>{{ old('content', $post->content) }}</textarea>
 
                     </div>
 
@@ -68,9 +84,11 @@
             <div class="card border-0 shadow-sm rounded-4 mb-4">
 
                 <div class="card-header bg-white py-3">
+
                     <h5 class="fw-bold mb-0">
                         Publikasi
                     </h5>
+
                 </div>
 
                 <div class="card-body">
@@ -86,12 +104,12 @@
                                 class="form-select">
 
                             <option value="draft"
-                                {{ $post->status == 'draft' ? 'selected' : '' }}>
+                                {{ old('status', $post->status) == 'draft' ? 'selected' : '' }}>
                                 Draft
                             </option>
 
                             <option value="published"
-                                {{ $post->status == 'published' ? 'selected' : '' }}>
+                                {{ old('status', $post->status) == 'published' ? 'selected' : '' }}>
                                 Publish
                             </option>
 
@@ -99,7 +117,33 @@
 
                     </div>
 
-                    {{-- BUTTON --}}
+                    {{-- KATEGORI --}}
+                    @isset($categories)
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-semibold">
+                            Kategori
+                        </label>
+
+                        <select name="categories_id"
+                                class="form-select">
+
+                            @foreach($categories as $category)
+
+                                <option value="{{ $category->id_categories }}"
+                                    {{ old('categories_id', $post->categories_id) == $category->id_categories ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+
+                            @endforeach
+
+                        </select>
+
+                    </div>
+
+                    @endisset
+
                     <button type="submit"
                             class="btn btn-danger w-100">
 
@@ -115,20 +159,24 @@
             <div class="card border-0 shadow-sm rounded-4">
 
                 <div class="card-header bg-white py-3">
+
                     <h5 class="fw-bold mb-0">
                         Thumbnail Berita
                     </h5>
+
                 </div>
 
                 <div class="card-body">
 
-                    {{-- PREVIEW GAMBAR LAMA --}}
-                    @if($post->image)
+                    {{-- PREVIEW GAMBAR LAMA / S3 --}}
+                    @if($post->image_url)
 
                         <img
-                            src="{{ asset('images/' . $post->image) }}"
+                            src="{{ $post->image_url }}"
+                            alt="{{ $post->title }}"
                             class="img-fluid rounded mb-3"
                             id="preview"
+                            style="width: 100%; max-height: 220px; object-fit: cover;"
                         >
 
                     @else
@@ -136,15 +184,20 @@
                         <img
                             id="preview"
                             class="img-fluid rounded mb-3 d-none"
+                            style="width: 100%; max-height: 220px; object-fit: cover;"
                         >
 
                     @endif
 
-                    {{-- INPUT FILE --}}
                     <input type="file"
                            name="image"
                            class="form-control"
+                           accept="image/jpeg,image/png,image/jpg"
                            onchange="previewImage(event)">
+
+                    <small class="text-muted d-block mt-2">
+                        Kosongkan jika tidak ingin mengganti gambar.
+                    </small>
 
                 </div>
 
@@ -156,25 +209,28 @@
 
 </form>
 
-{{-- PREVIEW IMAGE --}}
 <script>
-
 function previewImage(event)
 {
-    let reader = new FileReader();
+    const file = event.target.files[0];
+
+    if (!file) {
+        return;
+    }
+
+    const reader = new FileReader();
 
     reader.onload = function()
     {
-        let output = document.getElementById('preview');
+        const output = document.getElementById('preview');
 
         output.src = reader.result;
 
         output.classList.remove('d-none');
     }
 
-    reader.readAsDataURL(event.target.files[0]);
+    reader.readAsDataURL(file);
 }
-
 </script>
 
 @endsection

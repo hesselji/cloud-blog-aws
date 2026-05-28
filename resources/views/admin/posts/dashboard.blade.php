@@ -8,65 +8,76 @@
         Dashboard Admin
     </h2>
 
-    <!-- STATISTIK -->
+    {{-- STATISTIK --}}
     <div class="row mb-4">
 
         <div class="col-md-3">
+
             <div class="card shadow-sm border-0">
+
                 <div class="card-body">
 
                     <h3>{{ $totalPosts }}</h3>
-
                     <p>Total Berita</p>
 
                 </div>
+
             </div>
+
         </div>
 
         <div class="col-md-3">
+
             <div class="card shadow-sm border-0">
+
                 <div class="card-body">
 
                     <h3>{{ $publishedPosts }}</h3>
-
                     <p>Diterbitkan</p>
 
                 </div>
+
             </div>
+
         </div>
 
         <div class="col-md-3">
+
             <div class="card shadow-sm border-0">
+
                 <div class="card-body">
 
                     <h3>{{ $draftPosts }}</h3>
-
                     <p>Draft</p>
 
                 </div>
+
             </div>
+
         </div>
 
         <div class="col-md-3">
+
             <div class="card shadow-sm border-0">
+
                 <div class="card-body">
 
                     <h3>{{ $totalComments }}</h3>
-
                     <p>Komentar</p>
 
                 </div>
+
             </div>
+
         </div>
 
     </div>
 
-    <!-- FILTER -->
+    {{-- FILTER --}}
     <form method="GET">
 
         <div class="row mb-4">
 
-            <!-- SEARCH -->
             <div class="col-md-4">
 
                 <input
@@ -79,13 +90,10 @@
 
             </div>
 
-            <!-- CATEGORY -->
             <div class="col-md-3">
 
-                <select
-                    name="category"
-                    class="form-control"
-                >
+                <select name="category"
+                        class="form-control">
 
                     <option value="">
                         Semua Kategori
@@ -95,6 +103,7 @@
 
                         <option
                             value="{{ $category->id_categories }}"
+                            {{ request('category') == $category->id_categories ? 'selected' : '' }}
                         >
                             {{ $category->name }}
                         </option>
@@ -105,23 +114,22 @@
 
             </div>
 
-            <!-- STATUS -->
             <div class="col-md-2">
 
-                <select
-                    name="status"
-                    class="form-control"
-                >
+                <select name="status"
+                        class="form-control">
 
                     <option value="">
                         Semua Status
                     </option>
 
-                    <option value="published">
+                    <option value="published"
+                        {{ request('status') == 'published' ? 'selected' : '' }}>
                         Published
                     </option>
 
-                    <option value="draft">
+                    <option value="draft"
+                        {{ request('status') == 'draft' ? 'selected' : '' }}>
                         Draft
                     </option>
 
@@ -129,19 +137,18 @@
 
             </div>
 
-            <!-- SORT -->
             <div class="col-md-2">
 
-                <select
-                    name="sort"
-                    class="form-control"
-                >
+                <select name="sort"
+                        class="form-control">
 
-                    <option value="latest">
+                    <option value="latest"
+                        {{ request('sort') == 'latest' ? 'selected' : '' }}>
                         Terbaru
                     </option>
 
-                    <option value="oldest">
+                    <option value="oldest"
+                        {{ request('sort') == 'oldest' ? 'selected' : '' }}>
                         Terlama
                     </option>
 
@@ -164,7 +171,7 @@
 
     </form>
 
-    <!-- TABEL -->
+    {{-- TABEL --}}
     <div class="card border-0 shadow-sm">
 
         <div class="card-header bg-white">
@@ -182,13 +189,11 @@
                 <thead class="table-light">
 
                     <tr>
-
                         <th>Foto</th>
                         <th>Judul</th>
                         <th>Kategori</th>
                         <th>Status</th>
                         <th>Tanggal</th>
-
                     </tr>
 
                 </thead>
@@ -201,24 +206,31 @@
 
                             <td width="120">
 
-                                <img
-                                    src="{{ asset('images/' . $post->image) }}"
-                                    width="100"
-                                    class="rounded"
-                                >
+                                @if($post->image_url)
+
+                                    <img
+                                        src="{{ $post->image_url }}"
+                                        alt="{{ $post->title }}"
+                                        class="rounded"
+                                        style="width: 100px; height: 65px; object-fit: cover;"
+                                    >
+
+                                @else
+
+                                    <span class="text-muted small">
+                                        Tidak ada gambar
+                                    </span>
+
+                                @endif
 
                             </td>
 
                             <td>
-
                                 {{ $post->title }}
-
                             </td>
 
                             <td>
-
-                                {{ $post->category->name }}
-
+                                {{ $post->category->name ?? '-' }}
                             </td>
 
                             <td>
@@ -231,7 +243,7 @@
 
                                 @else
 
-                                    <span class="badge bg-warning">
+                                    <span class="badge bg-warning text-dark">
                                         Draft
                                     </span>
 
@@ -240,9 +252,7 @@
                             </td>
 
                             <td>
-
-                                {{ $post->created_at }}
-
+                                {{ $post->created_at->format('d M Y') }}
                             </td>
 
                         </tr>
@@ -251,10 +261,8 @@
 
                         <tr>
 
-                            <td colspan="5" class="text-center">
-
+                            <td colspan="5" class="text-center py-4">
                                 Data tidak ditemukan
-
                             </td>
 
                         </tr>

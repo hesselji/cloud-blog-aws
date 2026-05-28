@@ -12,12 +12,10 @@
             Daftar Artikel
         </h5>
 
-        <!-- BUTTON TAMBAH -->
         <a href="/admin/posts/create"
            class="btn btn-danger">
 
             <i class="fa fa-plus me-2"></i>
-
             Tambah Berita
 
         </a>
@@ -33,13 +31,11 @@
                 <thead class="table-light">
 
                     <tr>
-
                         <th width="120">Foto</th>
                         <th>Judul</th>
                         <th>Status</th>
                         <th>Tanggal</th>
                         <th width="120">Aksi</th>
-
                     </tr>
 
                 </thead>
@@ -50,68 +46,68 @@
 
                     <tr>
 
-                        <!-- FOTO -->
+                        {{-- FOTO --}}
                         <td>
 
-                            <img
-                                src="{{ asset('images/' . $post->image) }}"
-                                class="img-fluid rounded"
-                                width="100"
-                            >
+                            @if($post->image_url)
 
-                        </td>
-
-                        <!-- JUDUL -->
-                        <td>
-
-                            <div class="fw-bold mb-1">
-
-                                {{ $post->title }}
-
-                            </div>
-
-                            <small class="text-muted">
-
-                                {{ Str::limit($post->content, 60) }}
-
-                            </small>
-
-                        </td>
-
-                        <!-- STATUS -->
-                        <td>
-
-                            @if($post->status == 'published')
-
-                                <span class="badge bg-success">
-
-                                    Publish
-
-                                </span>
+                                <img
+                                    src="{{ $post->image_url }}"
+                                    alt="{{ $post->title }}"
+                                    class="img-fluid rounded"
+                                    style="width: 100px; height: 65px; object-fit: cover;"
+                                >
 
                             @else
 
-                                <span class="badge bg-warning text-dark">
-
-                                    Draft
-
+                                <span class="text-muted small">
+                                    Tidak ada gambar
                                 </span>
 
                             @endif
 
                         </td>
 
-                        <!-- TANGGAL -->
+                        {{-- JUDUL --}}
                         <td>
 
-                            {{ $post->created_at->format('d M Y') }}
+                            <div class="fw-bold mb-1">
+                                {{ $post->title }}
+                            </div>
+
+                            <small class="text-muted">
+                                {{ \Illuminate\Support\Str::limit($post->content, 60) }}
+                            </small>
 
                         </td>
 
-                        <!-- AKSI -->
+                        {{-- STATUS --}}
                         <td>
 
-                            <!-- EDIT -->
+                            @if($post->status == 'published')
+
+                                <span class="badge bg-success">
+                                    Publish
+                                </span>
+
+                            @else
+
+                                <span class="badge bg-warning text-dark">
+                                    Draft
+                                </span>
+
+                            @endif
+
+                        </td>
+
+                        {{-- TANGGAL --}}
+                        <td>
+                            {{ $post->created_at->format('d M Y') }}
+                        </td>
+
+                        {{-- AKSI --}}
+                        <td>
+
                             <a href="/admin/posts/edit/{{ $post->id_posts }}"
                                class="btn btn-primary btn-sm">
 
@@ -119,7 +115,6 @@
 
                             </a>
 
-                            <!-- DELETE -->
                             <a href="/admin/posts/delete/{{ $post->id_posts }}"
                                class="btn btn-danger btn-sm"
                                onclick="return confirm('Yakin hapus berita?')">
@@ -137,9 +132,7 @@
                     <tr>
 
                         <td colspan="5" class="text-center py-4">
-
                             Belum ada berita
-
                         </td>
 
                     </tr>
