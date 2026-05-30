@@ -4,7 +4,7 @@
 
 @section('content')
 
-<form action="{{ route('admin.posts.update', $post->id_posts) }}"
+<form action="/admin/posts/update/{{ $post->id_posts }}"
       method="POST"
       enctype="multipart/form-data">
 
